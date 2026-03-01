@@ -20,11 +20,17 @@ export class UserManager {
     addUser(name: string, socket: Socket) {
         this.users.push({ name, socket });
         this.queue.push(socket.id);
+        socket.emit("lobby");
+        console.log(this.users);
         this.initHandlers(socket);
         this.clearQueue();
     }
 
     removeUser(socket: string) {
+        const user = this.users.find(user => user.socket.id === socket);
+        if (user) {
+            console.log(`Removing user ${user.name} with socket ${socket}`);
+        }
         this.users = this.users.filter(user => user.socket.id !== socket);
     }
 
@@ -36,14 +42,19 @@ export class UserManager {
         if (this.queue.length < 2) {
             return;
         }
-        const user1 = this.users.find(user => user.socket.id === this.queue.pop());
-        const user2 = this.users.find(user => user.socket.id === this.queue.pop());
+        const id1 = this.queue.pop();
+        const id2 = this.queue.pop();
+        console.log("id is " + id1 + " " + id2);
+        const user1 = this.users.find(x => x.socket.id === id1);
+        const user2 = this.users.find(x => x.socket.id === id2);
+
         if (!user1 || !user2) {
-            console.log("Failed to match users");
             return;
         }
-        console.log(`Matched ${user1.name} with ${user2.name}`);
-        this.roomManager.createRoom(user1, user2);
+        console.log("creating room for " + user1.name + " and " + user2.name);
+
+        const room = this.roomManager.createRoom(user1, user2);
+        this.clearQueue();
     }
 
     initHandlers(socket: Socket) {
