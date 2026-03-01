@@ -1,0 +1,9 @@
+sequenceDiagram
+    User1 -->> Server: Connect
+    User2 -->> Server: Connect
+    Server -->> User1: send offer (roomId)
+    User1 -->> Server: offer(sdp)
+    Server -->> User2: offer(sdp)
+    User2 -->> Server: answer(sdp)
+    Server -->> User1: answer(sdp)
+

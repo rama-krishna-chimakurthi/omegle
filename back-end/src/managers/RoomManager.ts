@@ -30,6 +30,8 @@ export class RoomManager {
         return `room-${roomIdCounter++}`;
     }
 
+    // SDP => Session Description Protocol, used in WebRTC for negotiating connections
+
     onOffer(roomId: string, sdp: string) {
         const user2 = this.rooms.get(roomId)?.user2;
         user2?.socket.emit("offer", { sdp });
