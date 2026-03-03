@@ -1,26 +1,28 @@
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { UserManager } from "./managers/UserManager.js";
-import { RoomManager } from "./managers/RoomManager.js";
+import { Socket } from "socket.io";
+import http from "http";
 
-const httpServer = createServer();
-const io = new Server(httpServer, {
+import { Server } from 'socket.io';
+import { UserManager } from "./managers/UserManager.js";
+
+const server = http.createServer(http);
+
+const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: "*"
     }
 });
 
-const roomManager = new RoomManager();
-const userManager = new UserManager(roomManager);
+const userManager = new UserManager();
 
-io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.id);
-    // You can define other event handlers here
-    userManager.addUser("randomname", socket);
-    io.on("disconnect", () => {
-        console.log("Socket disconnected:", socket.id);
+io.on('connection', (socket: Socket) => {
+    console.log('a user connected');
+    userManager.addUser("randomName", socket);
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
         userManager.removeUser(socket.id);
-    });
+    })
 });
 
-httpServer.listen(3000, () => console.log(`API running on localhost:3000`));
+server.listen(3000, () => {
+    console.log('listening on *:3000');
+});
